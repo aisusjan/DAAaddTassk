@@ -1,0 +1,68 @@
+public class KMP {
+    // Computes the Longest Prefix Suffix (LPS) array for the pattern
+    public static int[] computeLPSArray(String pattern) {
+        int length = 0; // length of the previous longest prefix suffix
+        int i = 1;
+        int m = pattern.length();
+        int[] lps = new int[m];
+        lps[0] = 0; // lps[0] is always 0
+        while (i < m) {
+            if (pattern.charAt(i) == pattern.charAt(length)) {
+                length++;
+                lps[i] = length;
+                i++;
+            } else {
+                if (length != 0) {
+                    length = lps[length - 1];
+                } else {
+                    lps[i] = 0;
+                    i++;
+                }
+            }
+        }
+        return lps;
+    }
+
+    // KMP search algorithm for finding all occurrences of the pattern in the text
+    public static void KMPSearch(String pattern, String text) {
+        int m = pattern.length();
+        int n = text.length();
+        int[] lps = computeLPSArray(pattern);
+        int i = 0, j = 0; // i - text index, j - pattern index
+        while (i < n) {
+            if (pattern.charAt(j) == text.charAt(i)) {
+                i++;
+                j++;
+            }
+            if (j == m) {
+                System.out.println("Found pattern at index " + (i - j));
+                j = lps[j - 1]; // continue search for next occurrence
+            } else if (i < n && pattern.charAt(j) != text.charAt(i)) {
+                if (j != 0)
+                    j = lps[j - 1];
+                else
+                    i++;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        // Example 1: Short string
+        String text1 = "ABC ABCDAB ABCDABCDABDE";
+        String pattern1 = "ABCDABD";
+        KMPSearch(pattern1, text1);
+
+        // Example 2: Medium string
+        String text2 = "ABCDEFABABCDEFABCABCDABABCDABCDACDABCDABCDF";
+        String pattern2 = "ABCDABCD";
+        KMPSearch(pattern2, text2);
+
+        // Example 3: Long string
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 10000; i++) sb.append('A');
+        sb.append('B');
+        String text3 = sb.toString();
+        String pattern3 = "AAB";
+        KMPSearch(pattern3, text3);
+    }
+}
